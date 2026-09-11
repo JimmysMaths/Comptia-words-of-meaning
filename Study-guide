@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security+ Comptia study guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500&display=swap');
+  :root {
+    --od-green: #1f4b63; --tan: #7fb8c9; --tan-light: #d6f0f5; --black: #05080a;
+    --dark: #0f1a1f; --darker: #0a1216; --accent: #22d3ee; --red: #c0392b;
+    --green: #2ecc71; --muted: #4f7080; --card-bg: #101c22; --border: #24343d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--darker); color: var(--tan-light);
+    font-family: 'Barlow', sans-serif; min-height: 100vh;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(31,75,99,0.03) 40px, rgba(31,75,99,0.03) 41px),
+      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(31,75,99,0.03) 40px, rgba(31,75,99,0.03) 41px);
+  }
+  .topbar { position: sticky; top: 0; z-index: 100; }
+  header {
+    background: var(--dark); border-bottom: 2px solid var(--od-green);
+    padding: 14px 18px; display: flex; align-items: center; gap: 14px;
+  }
+  .header-left { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+
+  /* Hamburger */
+  .hamburger { background: transparent; border: 1px solid var(--border); width: 42px; height: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; flex-shrink: 0; transition: border-color 0.15s; }
+  .hamburger:hover, .hamburger:focus-visible { border-color: var(--accent); }
+  .hamburger span { display: block; width: 20px; height: 2px; background: var(--accent); transition: transform 0.2s, opacity 0.2s; }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Slide-down nav drawer */
+  .nav-drawer { background: var(--dark); border-bottom: 1px solid var(--border); overflow: hidden; max-height: 0; transition: max-height 0.25s ease; }
+  .nav-drawer.open { max-height: 340px; border-bottom: 2px solid var(--od-green); }
+  .nav-inner { display: flex; flex-direction: column; padding: 6px 0; }
+  .nav-item { background: transparent; border: none; border-left: 3px solid transparent; color: var(--tan-light); text-align: left; padding: 12px 20px; cursor: pointer; font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: baseline; gap: 10px; transition: background 0.15s; }
+  .nav-item:hover { background: rgba(31,75,99,0.25); }
+  .nav-item.active { border-left-color: var(--accent); color: var(--accent); background: rgba(31,75,99,0.2); }
+  .nav-item .nav-sub { font-family: 'Barlow', sans-serif; font-size: 11px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
+  .nav-item.active .nav-sub { color: var(--tan); }
+  .current-view-tag { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 2px; }
+  .unit-tag { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+  h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; }
+  .date-tag { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--muted); text-align: right; }
+
+  .score-bar { display: flex; gap: 16px; padding: 8px 18px; background: var(--dark); border-bottom: 1px solid var(--border); font-family: 'Share Tech Mono', monospace; font-size: 12px; flex-wrap: wrap; align-items: center; }
+  .score-item { display: flex; align-items: center; gap: 6px; }
+  .score-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-correct { background: var(--green); } .dot-wrong { background: var(--red); } .dot-skip { background: var(--muted); }
+  .reset-btn { margin-left: auto; background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 10px; padding: 3px 10px; cursor: pointer; letter-spacing: 1px; }
+  .reset-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .main { max-width: 820px; margin: 0 auto; padding: 24px 16px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin-bottom: 24px; }
+  .topic-btn { background: var(--card-bg); border: 1px solid var(--border); color: var(--tan-light); font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; padding: 10px 14px; cursor: pointer; text-align: left; transition: all 0.15s; position: relative; }
+  .topic-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .topic-btn.active { background: var(--od-green); border-color: var(--accent); color: var(--accent); }
+  .topic-btn .reg-tag { display: block; font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--muted); margin-bottom: 2px; }
+  .topic-btn.active .reg-tag { color: var(--tan); }
+  .topic-btn .count-tag { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--muted); float: right; }
+
+  .station-group-label { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin: 18px 0 8px; border-left: 3px solid var(--od-green); padding-left: 10px; }
+
+  .card-container { perspective: 1000px; margin-bottom: 16px; scroll-margin-top: 130px; }
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--od-green); min-height: 220px; padding: 28px; position: relative; transition: border-color 0.2s; }
+  .card.revealed { border-left-color: var(--accent); }
+  .card.correct-card { border-left-color: var(--green); }
+  .card.wrong-card { border-left-color: var(--red); }
+  .card-topic { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+  .card-q { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; line-height: 1.3; color: var(--tan-light); margin-bottom: 20px; }
+  .card-a { display: none; background: rgba(31,75,99,0.2); border: 1px solid var(--od-green); padding: 16px; font-size: 15px; line-height: 1.6; color: var(--tan); }
+  .card-a.show { display: block; }
+  .card-a strong { color: var(--accent); font-weight: 600; }
+  .reveal-btn { background: transparent; border: 1px solid var(--od-green); color: var(--tan); font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 1px; padding: 10px 20px; cursor: pointer; transition: all 0.15s; text-transform: uppercase; }
+  .reveal-btn:hover { background: var(--od-green); color: var(--accent); }
+  /* Bottom control deck — all answer actions live here */
+  .control-deck { position: sticky; bottom: 0; background: var(--darker); border-top: 1px solid var(--border); padding: 12px 0 14px; margin-top: 4px; z-index: 80; }
+  .deck-label { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .action-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .action-row + .action-row { margin-top: 10px; }
+  .btn { flex: 1; min-width: 100px; padding: 12px; border: none; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: opacity 0.15s; }
+  .btn:hover { opacity: 0.85; }
+  .btn-correct { background: var(--green); color: var(--black); }
+  .btn-wrong { background: var(--red); color: white; }
+  .btn-skip { background: var(--muted); color: var(--dark); }
+  .btn-next { background: var(--accent); color: var(--black); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .section-label { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .progress-bar-wrap { background: var(--dark); height: 4px; margin-bottom: 20px; position: relative; }
+  .progress-bar-fill { height: 100%; background: var(--accent); transition: width 0.3s; }
+  .weak-topics { background: rgba(192,57,43,0.1); border: 1px solid rgba(192,57,43,0.3); padding: 14px 18px; margin-top: 16px; }
+  .weak-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--red); letter-spacing: 2px; margin-bottom: 8px; }
+  .weak-list { font-size: 13px; color: var(--tan); line-height: 1.8; }
+  .info-box { background: rgba(34,211,238,0.07); border: 1px solid rgba(34,211,238,0.2); padding: 14px 18px; margin-bottom: 20px; font-size: 13px; line-height: 1.6; color: var(--tan); }
+  .separator { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+  .footer-credit { text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 1px; padding: 20px 16px 28px; font-style: italic; }
+  .version-tag { font-style: normal; color: var(--accent); margin-left: 10px; padding: 1px 7px; border: 1px solid var(--border); border-radius: 3px; font-size: 10px; }
+
+  /* Reference tables (AR / FM-DA / Memorize tabs) */
+  .ref-intro { font-size: 14px; line-height: 1.6; color: var(--tan); margin-bottom: 18px; }
+  table.ref { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px; }
+  table.ref th { background: var(--od-green); color: var(--tan-light); font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; text-align: left; padding: 10px 12px; }
+  table.ref td { border-bottom: 1px solid var(--border); padding: 10px 12px; vertical-align: top; color: var(--tan); }
+  table.ref td.code { font-family: 'Share Tech Mono', monospace; color: var(--accent); white-space: nowrap; font-size: 13px; }
+  table.ref tr:hover td { background: rgba(31,75,99,0.12); }
+
+  /* Memorize tab */
+  .creed-block { background: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--od-green); padding: 20px 24px; margin-bottom: 18px; }
+  .creed-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 900; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+  .creed-body { font-size: 15px; line-height: 1.7; color: var(--tan-light); }
+  .creed-body p { margin-bottom: 10px; }
+  .creed-body strong { color: var(--accent); }
+  .hide-toggle { background: transparent; border: 1px solid var(--od-green); color: var(--tan); font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 1px; padding: 4px 10px; cursor: pointer; float: right; }
+  .hide-toggle:hover { color: var(--accent); border-color: var(--accent); }
+  .creed-body.blurred { filter: blur(5px); user-select: none; }
+
+  /* Study Guide — nested accordion */
+  .sg-station { background: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--od-green); margin-bottom: 8px; }
+  .sg-station[open] { border-left-color: var(--accent); }
+  .sg-station > summary { list-style: none; cursor: pointer; padding: 14px 44px 14px 16px; position: relative; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .sg-station > summary::-webkit-details-marker { display: none; }
+  .sg-station > summary::after { content: '+'; position: absolute; right: 16px; top: 12px; font-family: 'Share Tech Mono', monospace; font-size: 18px; color: var(--accent); }
+  .sg-station[open] > summary::after { content: '–'; }
+  .sg-station > summary:hover { background: rgba(31,75,99,0.18); }
+  .sg-station-name { font-family: 'Barlow Condensed', sans-serif; font-size: 19px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); }
+  .sg-station-sub { font-size: 12px; color: var(--tan); }
+  .sg-count { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--muted); margin-left: auto; padding-right: 6px; }
+  .sg-station-body { border-top: 1px solid var(--border); padding: 4px 0; }
+  .sg-intro { font-size: 12px; color: var(--muted); font-style: italic; padding: 10px 16px; }
+
+  .sg-topic { border-top: 1px solid rgba(58,61,50,0.6); }
+  .sg-topic:first-child { border-top: none; }
+  .sg-topic > summary { list-style: none; cursor: pointer; padding: 11px 40px 11px 16px; position: relative; }
+  .sg-topic > summary::-webkit-details-marker { display: none; }
+  .sg-topic > summary::after { content: '›'; position: absolute; right: 18px; top: 9px; color: var(--muted); font-size: 16px; transition: transform 0.15s; display: inline-block; }
+  .sg-topic[open] > summary::after { transform: rotate(90deg); color: var(--accent); }
+  .sg-topic > summary:hover { background: rgba(31,75,99,0.14); }
+  .sg-topic[open] > summary { background: rgba(31,75,99,0.2); }
+  .sg-topic-name { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--tan-light); }
+  .sg-topic[open] .sg-topic-name { color: var(--accent); }
+
+  .sg-body { padding: 6px 18px 18px; font-size: 14px; line-height: 1.65; color: var(--tan); }
+  .sg-body p { margin-bottom: 10px; }
+  .sg-body strong { color: var(--accent); font-weight: 600; }
+  .sg-body em { color: var(--tan-light); }
+  .sg-body ul, .sg-body ol { margin: 0 0 12px 20px; }
+  .sg-body li { margin-bottom: 4px; }
+  .sg-body h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--tan-light); border-left: 3px solid var(--od-green); padding-left: 8px; margin: 16px 0 8px; }
+  .sg-body h4 { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; color: var(--tan); margin: 12px 0 6px; }
+  .sg-body a { color: var(--accent); word-break: break-all; }
+  .sg-body hr { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+  .sg-flag { background: rgba(192,57,43,0.1); border: 1px solid rgba(192,57,43,0.35); padding: 12px 14px; margin-bottom: 14px; font-size: 13px; line-height: 1.55; }
+  .sg-flag-label { display: block; font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+  .sg-flag strong { color: var(--tan-light); }
+
+  .reveal-btn { flex: 2; min-width: 140px; background: transparent; border: 1px solid var(--od-green); color: var(--tan); padding: 12px; }
+  .reveal-btn:hover:not(:disabled) { background: var(--od-green); color: var(--accent); opacity: 1; }
+  .btn-secondary { flex: 1; min-width: 90px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 560px) {
+    h1 { font-size: 18px; }
+    .date-tag { display: none; }
+    .card { padding: 20px; min-height: 180px; }
+    .card-q { font-size: 22px; }
+    .main { padding: 18px 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+<div class="topbar">
+<header>
+  <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-drawer">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="header-left">
+    <h1>Security+ Comptia study guide</h1>
+    <span class="current-view-tag" id="current-view-tag">FLASHCARDS</span>
+  </div>
+  <div class="date-tag" id="date-tag">LAST UPDATED: —<br>TARGET DATE: SET YOUR OWN</div>
+</header>
+
+<nav class="nav-drawer" id="nav-drawer">
+  <div class="nav-inner">
+    <button class="nav-item active" data-view="flashcards">Flashcards <span class="nav-sub">Drill by category and topic</span></button>
+    <button class="nav-item" data-view="guide">Study Guide <span class="nav-sub">Full guide, expand by category</span></button>
+  </div>
+</nav>
+
+<div class="score-bar" id="score-bar">
+  <span class="score-item"><span class="score-dot dot-correct"></span><span id="score-correct">0</span> CORRECT</span>
+  <span class="score-item"><span class="score-dot dot-wrong"></span><span id="score-wrong">0</span> WRONG</span>
+  <span class="score-item"><span class="score-dot dot-skip"></span><span id="score-skip">0</span> SKIPPED</span>
+  <span class="score-item" style="color: var(--accent); font-size:11px;" id="current-topic-tag">— SELECT TOPIC —</span>
+  <button class="reset-btn" onclick="resetScores()">RESET</button>
+</div>
+</div>
+
+<div class="main">
+
+  <!-- ============ FLASHCARDS VIEW ============ -->
+  <div class="view active" id="view-flashcards">
+    <div class="section-label">Select Topic</div>
+    <div class="topic-grid" id="topic-grid"></div>
+    <hr class="separator">
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+    <div class="card-container">
+      <div class="card" id="main-card">
+        <div class="card-topic" id="card-topic">— SELECT A TOPIC ABOVE —</div>
+        <div class="card-q" id="card-q">Choose a topic from the list above to begin.</div>
+        <div class="card-a" id="card-a"></div>
+      </div>
+    </div>
+    <div class="weak-topics" id="weak-section" style="display:none">
+      <div class="weak-label">▲ WEAK AREAS — NEEDS WORK</div>
+      <div class="weak-list" id="weak-list"></div>
+    </div>
+
+    <div class="control-deck">
+      <div class="deck-label" id="deck-label">Answer out loud, then reveal</div>
+      <div class="action-row" id="reveal-row">
+        <button class="btn reveal-btn" id="reveal-btn" onclick="revealAnswer()" disabled>REVEAL ANSWER</button>
+        <button class="btn btn-skip btn-secondary" onclick="skipCard()" id="skip-btn" disabled>SKIP</button>
+      </div>
+      <div class="action-row" id="judge-row" style="display:none">
+        <button class="btn btn-correct" onclick="markCard('correct')">✓ GOT IT</button>
+        <button class="btn btn-wrong" onclick="markCard('wrong')">✗ MISSED</button>
+      </div>
+      <div class="action-row" id="next-row" style="display:none">
+        <button class="btn btn-next" onclick="nextCard()" id="next-btn">NEXT →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ STUDY GUIDE VIEW ============ -->
+  <div class="view" id="view-guide">
+    <p class="ref-intro">Your full study guide, straight from the source file. Tap a station to open it, then tap a topic to read it. Everything starts closed so you can work one station at a time.</p>
+    <div id="guide-content">
+
+<details class="sg-station" open><summary><span class="sg-station-name">Category 1</span><span class="sg-station-sub">CompTIA Security+ SY0-701 acronyms, expanded</span><span class="sg-count">12 topics</span></summary><div class="sg-station-body"><p class="sg-intro">Subjects: Cloud &amp; Virtualization, Cryptography &amp; PKI, Data Protection &amp; Privacy, Email &amp; Messaging, Endpoint, Host &amp; Application, Governance, Risk &amp; Compliance, Identity &amp; Access Management, Network &amp; Infrastructure, Physical &amp; Environmental, Security Operations &amp; Monitoring, Threats, Attacks &amp; Malware, Wireless &amp; Mobile.</p><details class="sg-topic"><summary><span class="sg-topic-name">Cloud &amp; Virtualization</span></summary><div class="sg-body"><ul><li><strong>CASB</strong> — Cloud Access Security Broker</li>
+<li><strong>CSP</strong> — Cloud Service Provider</li>
+<li><strong>IaaS</strong> — Infrastructure as a Service</li>
+<li><strong>IaC</strong> — Infrastructure as Code</li>
+<li><strong>MaaS</strong> — Monitoring as a Service</li>
+<li><strong>PaaS</strong> — Platform as a Service</li>
+<li><strong>SaaS</strong> — Software as a Service</li>
+<li><strong>VDI</strong> — Virtual Desktop Infrastructure</li>
+<li><strong>VM</strong> — Virtual Machine</li>
+<li><strong>VPC</strong> — Virtual Private Cloud</li></ul></div></details><details class="sg-topic"><summary><span class="sg-topic-name">Cryptography &amp; PKI</span></summary><div class="sg-body"><ul><li><strong>AES</strong> — Advanced Encryption Standard</li>
+<li><strong>AES-256</strong> — Advanced Encryption Standard 256-bit</li>
+<li><strong>CA</strong> — Certificate Authority</li>
+<li><strong>CBC</strong> — Cipher Block Chaining</li>
+<li><strong>CFB</strong> — Cipher Feedback</li>
+<li><strong>CRL</strong> — Certificate Revocation List</li>
+<li><strong>CSR</strong> — Certificate Signing Request</li>
+<li><strong>DES</strong> — Data Encryption Standard</li>
+<li><strong>DHE</strong> — Diffie-Hellman Ephemeral</li>
+<li><strong>DSA</strong> — Digital Signature Algorithm</li>
+<li><strong>ECB</strong> — Electronic Codebook</li>
+<li><strong>ECC</strong> — Elliptic Curve Cryptography</li>
+<li><strong>ECDHE</strong> — Elliptic Curve Diffie-Hellman Ephemeral</li>
+<li><strong>ECDSA</strong> — Elliptic Curve Digital Signature Algorithm</li>
+<li><strong>GCM</strong> — Galois/Counter Mode</li>
+<li><strong>GPG</strong> — GNU Privacy Guard</li>
+<li><strong>HMAC</strong> — Hash-based Message Authentication Code</li>
+<li><strong>HSM</strong> — Hardware Security Module</li>
+<li><strong>IKE</strong> — Internet Key Exchange</li>
+<li><strong>IPSec</strong> — Internet Protocol Security</li>
+<li><strong>IV</strong> — Initialization Vector</li>
+<li><strong>KEK</strong> — Key Encryption Key</li>
+<li><strong>MAC</strong> — Message Authentication Code <em>(message authentication context)</em></li>
+<li><strong>OCSP</strong> — Online Certificate Status Protocol</li>
+<li><strong>OID</strong> — Object Identifier</li>
+<li><strong>PEM</strong> — Privacy Enhanced Mail</li>
+<li><strong>PFS</strong> — Perfect Forward Secrecy</li>
+<li><strong>PKCS</strong> — Public Key Cryptography Standards</li>
+<li><strong>PKI</strong> — Public Key Infrastructure</li>
+<li><strong>RA</strong> — Registration Authority</li>
+<li><strong>RC4</strong> — Rivest Cipher 4</li>
+<li><strong>RSA</strong> — Rivest-Shamir-Adleman</li>
+<li><strong>SHA</strong> — Secure Hash Algorithm</li>
+<li><strong>SSL</strong> — Secure Sockets Layer</li>
+<li><strong>TLS</strong> — Transport Layer Security</li>
+<li><strong>XOR</strong> — Exclusive OR</li></ul></div></details><details class="sg-topic"><summary><span class="sg-topic-name">Data Protection &amp; Privacy</span></summary><div class="sg-body"><ul><li><strong>DBA</strong> — Database Administrator</li>
+<li><strong>DLP</strong> — Data Loss Prevention</li>
+<li><strong>EFS</strong> — Encrypting File System</li>
+<li><strong>FDE</strong> — Full Disk Encryption</li>
+<li><strong>HDD</strong> — Hard Disk Drive</li>
+<li><strong>PHI</strong> — Protected Health Information</li>
+<li><strong>PII</strong> — Personally Identifiable Information</li>
+<li><strong>RAID</strong> — Redundant Array of Independent Disks</li>
+<li><strong>SED</strong> — Self-Encrypting Drive</li>
+<li><strong>SSD</strong> — Solid State Drive</li></ul></div></details><details class="sg-topic"><summary><span class="sg-topic-name">Email &amp; Messaging</span></summary><div class="sg-body"><ul><li><strong>DKIM</strong> — DomainKeys Identified Mail</li>
+<li><strong>DMARC</strong> — Domain-based Message Authentication, Reporting, and Conformance</li>
+<li><strong>IM</strong> — Instant Messaging</li>
+<li><strong>IMAP</strong> — Internet Message Access Protocol</li>
+<li><strong>PGP</strong> — Pretty Good Privacy</li>
+<li><strong>POP</strong> — Post Office Protocol</li>
+<li><strong>S/MIME</strong> — Secure/Multipurpose Internet Mail Extensions</li>
+<li><strong>SMTP</strong> — Simple Mail Transfer Protocol</li>
+<li><strong>SMTPS</strong> — Simple Mail Transfer Protocol Secure</li>
+<li><strong>SPF</strong> — Sender Policy Framework</li>
+<li><strong>SPIM</strong> — Spam over Instant Messaging</li></ul></div></details><details class="sg-topic"><summary><span class="sg-topic-name">Endpoint, Host &amp; Application</span></summary><div class="sg-body"><ul><li><strong>API</strong> — Application Programming Interface</li>
+<li><strong>ASLR</strong> — Address Space Layout Randomization</li>
+<li><strong>AV</strong> — Antivirus</li>
+<li><strong>BASH</strong> — Bourne Again Shell</li>
+<li><strong>BIOS</strong> — Basic Input/Output System</li>
+<li><strong>CMS</strong> — Content Management System</li>
+<li><strong>DEP</strong> — Data Execution Prevention</li>
+<li><strong>DLL</strong> — Dynamic Link Library</li>
+<li><strong>EDR</strong> — Endpoint Detection and Response</li>
+<li><strong>FACL</strong> — File System Access Control List</li>
+<li><strong>FPGA</strong> — Field Programmable Gate Array</li>
+<li><strong>GPO</strong> — Group Policy Object</li>
+<li><strong>HIDS</strong> — Host-based Intrusion Detection System</li>
+<li><strong>HIPS</strong> — Host-based Intrusion Prevention System</li>
+<li><strong>HTML</strong> — Hypertext Markup Language</li>
+<li><strong>IoT</strong> — Internet of Things</li>
+<li><strong>MFD</strong> — Multifunction Device</li>
+<li><strong>MFP</strong> — Multifunction Printer</li>
+<li><strong>NTFS</strong> — New Technology File System</li>
+<li><strong>OS</strong> — Operating System</li>
+<li><strong>PED</strong> — Personal Electronic Device</li>
+<li><strong>RTOS</strong> — Real-Time Operating System</li>
+<li><strong>SDK</strong> — Software Development Kit</li>
+<li><strong>SDLC</strong> — Software Development Lifecycle</li>
+<li><strong>SOAP</strong> — Simple Object Access Protocol</li>
+<li><strong>SoC</strong> — System on Chip</li>
+<li><strong>SQL</strong> — Structured Query Language</li>
+<li><strong>TPM</strong> — Trusted Platform Module</li>
+<li><strong>UEFI</strong> — Unified Extensible Firmware Interface</li>
+<li><strong>UEM</strong> — Unified Endpoint Management</li>
+<li><strong>USB</strong> — Universal Serial Bus</li>
+<li><strong>USB OTG</strong> — USB On-the-Go</li>
+<li><strong>WAF</strong> — Web Application Firewall</li>
+<li><strong>XML</strong> — Extensible Markup Language</li></ul></div></details><details class="sg-topic"><summary><span class="sg-topic-name">Governance, Risk &amp; Compliance</span></summary><div class="sg-body"><ul><li><strong>ALE</strong> — Annualized Loss Expectancy</li>
+<li><strong>ARO</strong> — Annualized Rate of Occurrence</li>
+<li><strong>AUP</strong> — Acceptable Use Policy</li>
+<li><strong>BCP</strong> — Business Continuity Plan</li>
+<li><strong>BIA</strong> — Business Impact Analysis</li>
+<li><strong>BPA</strong> — Business Partners Agreement</li>
+<li><strong>CAR</strong> — Corrective Action Report</li>
+<li><strong>CIA</strong> — Confidentiality, Integrity, and Availability</li>
+<li><strong>CIO</strong> — Chief Information Officer</li>
+<li><strong>COOP</strong> — Continuity of Operations Plan</li>
+<li><strong>CP</strong> — Contingency Planning</li>
+<li><strong>CSO</strong> — Chief Security Officer</li>
+<li><strong>CTO</strong> — Chief Technology Officer</li>
+<li><strong>DPO</strong> — Data Protection Officer</li>
+<li><strong>DRP</strong> — Disaster Recovery Plan</li>
+<li><strong>ERP</strong> — Enterprise Resource Planning</li>
+<li><strong>GDPR</strong> — General Data Protection Regulation</li>
+<li><strong>ISO</strong> — International Organization for Standardization</li>
+<li><strong>ISSO</strong> — Information Systems Security Officer</li>
+<li><strong>MOA</strong> — Memorandum of Agreement</li>
+<li><strong>MOU</strong> — Memorandum of Understanding</li>
+<li><strong>MSA</strong> — Master Service Agreement</li>
+<li><strong>MSP</strong> — Managed Service Provider</li>
+<li><strong>MTBF</strong> — Mean Time Between Failures</li>
+<li><strong>MTTF</strong> — Mean Time to Failure</li>
+<li><strong>NDA</strong> — Non-Disclosure Agreement</li>
+<li><strong>NIST</strong> — National Institute of Standards and Technology</li>
+<li><strong>PCI DSS</strong> — Payment Card Industry Data Security Standard</li>
+<li><strong>ROI</strong> — Return on Investment</li>
+<li><strong>RTO</strong> — Recovery Time Objective</li>
+<li><strong>SLA</strong> — Service Level Agreement</li>
+<li><strong>SLE</strong> — Single Loss Expectancy</li>
+<li><strong>SOW</strong> — Statement of Work</li>
+<li><strong>UAT</strong> — User Acceptance Testing</li></ul></div></details><details class="sg-topic"><summary><span class="sg-topic-name">Identity &amp; Access Management</span></summary><div class="sg-body"><ul><li><strong>AAA</strong> — Authentication, Authorization, and Accounting</li>
+<li><strong>CAPTCHA</strong> — Completely Automated Public Turing Test to Tell Computers and Humans Apart</li>
+<li><strong>CHAP</strong> — Challenge Handshake Authentication Protocol</li>
+<li><strong>DAC</strong> — Discretionary Access Control</li>
+<li><strong>EAP</strong> — Extensible Authentication Protocol</li>
+<li><strong>FAR</strong> — False Acceptance Rate</li>
+<li><strong>FRR</strong> — False Rejection Rate</li>
+<li><strong>HOTP</strong> — HMAC-based One-Time Password</li>
+<li><strong>IAM</strong> — Identity and Access Management</li>
+<li><strong>IdP</strong> — Identity Provider</li>
+<li><strong>KDC</strong> — Key Distribution Center</li>
+<li><strong>LDAP</strong> — Lightweight Directory Access Protocol</li>
+<li><strong>MAC</strong> — Mandatory Access Control <em>(access control model context)</em></li>
+<li><strong>MFA</strong> — Multifactor Authentication</li>
+<li><strong>NTLM</strong> — New Technology LAN Manager</li>
+<li><strong>OAuth</strong> — Open Authorization</li>
+<li><strong>PAM</strong> — Privileged Access Management <em>(security discipline context)</em></li>
+<li><strong>PAM</strong> — Pluggable Authentication Modules <em>(Linux/Unix authentication context)</em></li>
+<li><strong>PAP</strong> — Password Authentication Protocol</li>
+<li><strong>PIV</strong> — Personal Identity Verification</li>
+<li><strong>RBAC</strong> — Role-Based Access Control <em>(the common model)</em></li>
+<li><strong>RBAC</strong> — Rule-Based Access Control <em>(the rule-based variant)</em></li>
+<li><strong>SAML</strong> — Security Assertion Markup Language</li>
+<li><strong>SSO</strong> — Single Sign-On</li>
+<li><strong>TACACS+</strong> — Terminal Access Controller Access Control System Plus</li>
+<li><strong>TGT</strong> — Ticket Granting Ticket</li>
+<li><strong>TOTP</strong> — Time-based One-Time Password</li>
+<li><strong>ZTNA</strong> — Zero Trust Network Access</li></ul></div></details><details class="sg-topic"><summary><span class="sg-topic-name">Network &amp; Infrastructure</span></summary><div class="sg-body"><ul><li><strong>ACL</strong> — Access Control List</li>
+<li><strong>AH</strong> — Authentication Header</li>
+<li><strong>ARP</strong> — Address Resolution Protocol</li>
+<li><strong>BGP</strong> — Border Gateway Protocol</li>
+<li><strong>BPDU</strong> — Bridge Protocol Data Unit</li>
+<li><strong>CRC</strong> — Cyclic Redundancy Check</li>
+<li><strong>CSU</strong> — Channel Service Unit</li>
+<li><strong>DHCP</strong> — Dynamic Host Configuration Protocol</li>
+<li><strong>DNAT</strong> — Destination Network Address Translation</li>
+<li><strong>DNS</strong> — Domain Name System</li>
+<li><strong>DNSSEC</strong> — Domain Name System Security Extensions</li>
+<li><strong>ESP</strong> — Encapsulating Security Payload</li>
+<li><strong>FTP</strong> — File Transfer Protocol</li>
+<li><strong>FTPS</strong> — File Transfer Protocol Secure</li>
+<li><strong>GRE</strong> — Generic Routing Encapsulation</li>
+<li><strong>HTTP</strong> — Hypertext Transfer Protocol</li>
+<li><strong>HTTPS</strong> — Hypertext Transfer Protocol Secure</li>
+<li><strong>ICMP</strong> — Internet Control Message Protocol</li>
+<li><strong>ICS</strong> — Industrial Control System</li>
+<li><strong>IEEE</strong> — Institute of Electrical and Electronics Engineers</li>
+<li><strong>IP</strong> — Internet Protocol</li>
+<li><strong>ISP</strong> — Internet Service Provider</li>
+<li><strong>L2TP</strong> — Layer 2 Tunneling Protocol</li>
+<li><strong>LAN</strong> — Local Area Network</li>
+<li><strong>MAC</strong> — Media Access Control Address <em>(hardware address context)</em></li>
+<li><strong>MAN</strong> — Metropolitan Area Network</li>
+<li><strong>MPLS</strong> — Multiprotocol Label Switching</li>
+<li><strong>MTU</strong> — Maximum Transmission Unit</li>
+<li><strong>NAC</strong> — Network Access Control</li>
+<li><strong>NAT</strong> — Network Address Translation</li>
+<li><strong>NGFW</strong> — Next-Generation Firewall</li>
+<li><strong>NTP</strong> — Network Time Protocol</li>
+<li><strong>OSPF</strong> — Open Shortest Path First</li>
+<li><strong>OT</strong> — Operational Technology</li>
+<li><strong>P2P</strong> — Peer-to-Peer</li>
+<li><strong>PAC</strong> — Proxy Auto Configuration</li>
+<li><strong>PAT</strong> — Port Address Translation</li>
+<li><strong>PBX</strong> — Private Branch Exchange</li>
+<li><strong>POTS</strong> — Plain Old Telephone Service</li>
+<li><strong>PPP</strong> — Point-to-Point Protocol</li>
+<li><strong>PPTP</strong> — Point-to-Point Tunneling Protocol</li>
+<li><strong>RADIUS</strong> — Remote Authentication Dial-In User Service</li>
+<li><strong>RAS</strong> — Remote Access Server</li>
+<li><strong>RDP</strong> — Remote Desktop Protocol</li>
+<li><strong>SASE</strong> — Secure Access Service Edge</li>
+<li><strong>SCADA</strong> — Supervisory Control and Data Acquisition</li>
+<li><strong>SD-WAN</strong> — Software-Defined Wide Area Network</li>
+<li><strong>SDN</strong> — Software-Defined Networking</li>
+<li><strong>SFTP</strong> — Secure File Transfer Protocol</li>
+<li><strong>SNMP</strong> — Simple Network Management Protocol</li>
+<li><strong>SRTP</strong> — Secure Real-Time Transport Protocol</li>
+<li><strong>SSH</strong> — Secure Shell</li>
+<li><strong>STP</strong> — Shielded Twisted Pair</li>
+<li><strong>SWG</strong> — Secure Web Gateway</li>
+<li><strong>TCP</strong> — Transmission Control Protocol</li>
+<li><strong>UDP</strong> — User Datagram Protocol</li>
+<li><strong>URI</strong> — Uniform Resource Identifier</li>
+<li><strong>UTM</strong> — Unified Threat Management</li>
+<li><strong>UTP</strong> — Unshielded Twisted Pair</li>
+<li><strong>VLAN</strong> — Virtual Local Area Network</li>
+<li><strong>VLSM</strong> — Variable Length Subnet Masking</li>
+<li><strong>VoIP</strong> — Voice over Internet Protocol</li>
+<li><strong>VPN</strong> — Virtual Private Network</li></ul></div></details><details class="sg-topic"><summary><span class="sg-topic-name">Physical &amp; Environmental</span></summary><div class="sg-body"><ul><li><strong>CCTV</strong> — Closed-Circuit Television</li>
+<li><strong>HVAC</strong> — Heating, Ventilation, and Air Conditioning</li>
+<li><strong>IDF</strong> — Intermediate Distribution Frame</li>
+<li><strong>MDF</strong> — Main Distribution Frame</li>
+<li><strong>PDU</strong> — Power Distribution Unit</li>
+<li><strong>RFID</strong> — Radio Frequency Identification</li>
+<li><strong>UAV</strong> — Unmanned Aerial Vehicle</li>
+<li><strong>UPS</strong> — Uninterruptible Power Supply</li></ul></div></details><details class="sg-topic"><summary><span class="sg-topic-name">Security Operations &amp; Monitoring</span></summary><div class="sg-body"><ul><li><strong>AI</strong> — Artificial Intelligence</li>
+<li><strong>AIS</strong> — Automated Indicator Sharing</li>
+<li><strong>ATT&amp;CK</strong> — Adversarial Tactics, Techniques, and Common Knowledge</li>
+<li><strong>CERT</strong> — Computer Emergency Response Team</li>
+<li><strong>CIRT</strong> — Computer Incident Response Team</li>
+<li><strong>CVE</strong> — Common Vulnerabilities and Exposures</li>
+<li><strong>CVSS</strong> — Common Vulnerability Scoring System</li>
+<li><strong>FIM</strong> — File Integrity Monitoring</li>
+<li><strong>HA</strong> — High Availability</li>
+<li><strong>IDS</strong> — Intrusion Detection System</li>
+<li><strong>IoC</strong> — Indicators of Compromise</li>
+<li><strong>IPS</strong> — Intrusion Prevention System</li>
+<li><strong>IR</strong> — Incident Response</li>
+<li><strong>IRP</strong> — Incident Response Plan</li>
+<li><strong>ML</strong> — Machine Learning</li>
+<li><strong>MSSP</strong> — Managed Security Service Provider</li>
+<li><strong>MTTR</strong> — Mean Time to Repair</li>
+<li><strong>NIDS</strong> — Network-based Intrusion Detection System</li>
+<li><strong>NIPS</strong> — Network-based Intrusion Prevention System</li>
+<li><strong>PCAP</strong> — Packet Capture</li>
+<li><strong>RPO</strong> — Recovery Point Objective</li>
+<li><strong>SCAP</strong> — Security Content Automation Protocol</li>
+<li><strong>SIEM</strong> — Security Information and Event Management</li>
+<li><strong>SOAR</strong> — Security Orchestration, Automation, and Response</li>
+<li><strong>SOC</strong> — Security Operations Center</li>
+<li><strong>STIX</strong> — Structured Threat Information eXpression</li>
+<li><strong>TAXII</strong> — Trusted Automated eXchange of Indicator Information</li>
+<li><strong>UEBA</strong> — User and Entity Behavior Analytics</li>
+<li><strong>XDR</strong> — Extended Detection and Response</li></ul></div></details><details class="sg-topic"><summary><span class="sg-topic-name">Threats, Attacks &amp; Malware</span></summary><div class="sg-body"><ul><li><strong>APT</strong> — Advanced Persistent Threat</li>
+<li><strong>CSRF</strong> — Cross-Site Request Forgery</li>
+<li><strong>DDoS</strong> — Distributed Denial-of-Service</li>
+<li><strong>DoS</strong> — Denial-of-Service</li>
+<li><strong>GPU</strong> — Graphics Processing Unit</li>
+<li><strong>IRC</strong> — Internet Relay Chat</li>
+<li><strong>OSINT</strong> — Open-Source Intelligence</li>
+<li><strong>RAT</strong> — Remote Access Trojan</li>
+<li><strong>SEH</strong> — Structured Exception Handler</li>
+<li><strong>SQLi</strong> — SQL Injection</li>
+<li><strong>TTP</strong> — Tactics, Techniques, and Procedures</li>
+<li><strong>URL</strong> — Uniform Resource Locator</li>
+<li><strong>VBA</strong> — Visual Basic for Applications</li>
+<li><strong>XSRF</strong> — Cross-Site Request Forgery</li>
+<li><strong>XSS</strong> — Cross-Site Scripting</li></ul></div></details><details class="sg-topic"><summary><span class="sg-topic-name">Wireless &amp; Mobile</span></summary><div class="sg-body"><ul><li><strong>AP</strong> — Access Point</li>
+<li><strong>BYOD</strong> — Bring Your Own Device</li>
+<li><strong>CCMP</strong> — Counter Mode/CBC-MAC Protocol</li>
+<li><strong>COPE</strong> — Corporate-Owned, Personally Enabled</li>
+<li><strong>CYOD</strong> — Choose Your Own Device</li>
+<li><strong>ESN</strong> — Electronic Serial Number</li>
+<li><strong>GPS</strong> — Global Positioning System</li>
+<li><strong>LEAP</strong> — Lightweight Extensible Authentication Protocol</li>
+<li><strong>MDM</strong> — Mobile Device Management</li>
+<li><strong>MMS</strong> — Multimedia Messaging Service</li>
+<li><strong>NFC</strong> — Near Field Communication</li>
+<li><strong>OTA</strong> — Over-the-Air</li>
+<li><strong>PEAP</strong> — Protected Extensible Authentication Protocol</li>
+<li><strong>PSK</strong> — Pre-Shared Key</li>
+<li><strong>SAE</strong> — Simultaneous Authentication of Equals</li>
+<li><strong>SIM</strong> — Subscriber Identity Module</li>
+<li><strong>SMS</strong> — Short Message Service</li>
+<li><strong>TKIP</strong> — Temporal Key Integrity Protocol</li>
+<li><strong>WAP</strong> — Wireless Access Point</li>
+<li><strong>WEP</strong> — Wired Equivalent Privacy</li>
+<li><strong>WIDS</strong> — Wireless Intrusion Detection System</li>
+<li><strong>WIPS</strong> — Wireless Intrusion Prevention System</li>
+<li><strong>WPA</strong> — Wi-Fi Protected Access</li>
+<li><strong>WPS</strong> — Wi-Fi Protected Setup</li></ul></div></details></div></details>
+</div>
+  </div>
+
+
+</div>
+
+<div class="footer-credit">*Put together by Jimmy<span class="version-tag">v1.0</span></div>
+
+<script>
+/* ============================================================
+   DATA — sourced from the candidate's verified Study Guide.
+   ============================================================ */
+
+/* ============================================================
+   DATA — replace this whole block with your own subject's content.
+   Each TOPIC needs:
+     id      unique string, used internally
+     station group number — topics that share a number are grouped
+             together in the topic grid and under STATION_NAMES below
+     name    label shown on the topic button
+     reg     short reference tag shown above the topic name
+     cards   array of { q, a } flashcard pairs — "a" accepts HTML
+   ============================================================ */
+
+const TOPICS = [
+  /* ---------- CATEGORY 1: SECURITY+ ACRONYMS ---------- */
+  { id: 'acr-cloud', station: 1, name: "Cloud & Virtualization", reg: "CLOUD", cards: [
+    { q: "What does CASB stand for?", a: "Cloud Access Security Broker" },
+    { q: "What does CSP stand for?", a: "Cloud Service Provider" },
+    { q: "What does IaaS stand for?", a: "Infrastructure as a Service" },
+    { q: "What does IaC stand for?", a: "Infrastructure as Code" },
+    { q: "What does MaaS stand for?", a: "Monitoring as a Service" },
+    { q: "What does PaaS stand for?", a: "Platform as a Service" },
+    { q: "What does SaaS stand for?", a: "Software as a Service" },
+    { q: "What does VDI stand for?", a: "Virtual Desktop Infrastructure" },
+    { q: "What does VM stand for?", a: "Virtual Machine" },
+    { q: "What does VPC stand for?", a: "Virtual Private Cloud" },
+  ]},
+  { id: 'acr-crypto', station: 1, name: "Cryptography & PKI", reg: "CRYPTO", cards: [
+    { q: "What does AES stand for?", a: "Advanced Encryption Standard" },
+    { q: "What does AES-256 stand for?", a: "Advanced Encryption Standard 256-bit" },
+    { q: "What does CA stand for?", a: "Certificate Authority" },
+    { q: "What does CBC stand for?", a: "Cipher Block Chaining" },
+    { q: "What does CFB stand for?", a: "Cipher Feedback" },
+    { q: "What does CRL stand for?", a: "Certificate Revocation List" },
+    { q: "What does CSR stand for?", a: "Certificate Signing Request" },
+    { q: "What does DES stand for?", a: "Data Encryption Standard" },
+    { q: "What does DHE stand for?", a: "Diffie-Hellman Ephemeral" },
+    { q: "What does DSA stand for?", a: "Digital Signature Algorithm" },
+    { q: "What does ECB stand for?", a: "Electronic Codebook" },
+    { q: "What does ECC stand for?", a: "Elliptic Curve Cryptography" },
+    { q: "What does ECDHE stand for?", a: "Elliptic Curve Diffie-Hellman Ephemeral" },
+    { q: "What does ECDSA stand for?", a: "Elliptic Curve Digital Signature Algorithm" },
+    { q: "What does GCM stand for?", a: "Galois/Counter Mode" },
+    { q: "What does GPG stand for?", a: "GNU Privacy Guard" },
+    { q: "What does HMAC stand for?", a: "Hash-based Message Authentication Code" },
+    { q: "What does HSM stand for?", a: "Hardware Security Module" },
+    { q: "What does IKE stand for?", a: "Internet Key Exchange" },
+    { q: "What does IPSec stand for?", a: "Internet Protocol Security" },
+    { q: "What does IV stand for?", a: "Initialization Vector" },
+    { q: "What does KEK stand for?", a: "Key Encryption Key" },
+    { q: "What does MAC stand for (message authentication context)?", a: "Message Authentication Code" },
+    { q: "What does OCSP stand for?", a: "Online Certificate Status Protocol" },
+    { q: "What does OID stand for?", a: "Object Identifier" },
+    { q: "What does PEM stand for?", a: "Privacy Enhanced Mail" },
+    { q: "What does PFS stand for?", a: "Perfect Forward Secrecy" },
+    { q: "What does PKCS stand for?", a: "Public Key Cryptography Standards" },
+    { q: "What does PKI stand for?", a: "Public Key Infrastructure" },
+    { q: "What does RA stand for?", a: "Registration Authority" },
+    { q: "What does RC4 stand for?", a: "Rivest Cipher 4" },
+    { q: "What does RSA stand for?", a: "Rivest-Shamir-Adleman" },
+    { q: "What does SHA stand for?", a: "Secure Hash Algorithm" },
+    { q: "What does SSL stand for?", a: "Secure Sockets Layer" },
+    { q: "What does TLS stand for?", a: "Transport Layer Security" },
+    { q: "What does XOR stand for?", a: "Exclusive OR" },
+  ]},
+  { id: 'acr-data', station: 1, name: "Data Protection & Privacy", reg: "DATA", cards: [
+    { q: "What does DBA stand for?", a: "Database Administrator" },
+    { q: "What does DLP stand for?", a: "Data Loss Prevention" },
+    { q: "What does EFS stand for?", a: "Encrypting File System" },
+    { q: "What does FDE stand for?", a: "Full Disk Encryption" },
+    { q: "What does HDD stand for?", a: "Hard Disk Drive" },
+    { q: "What does PHI stand for?", a: "Protected Health Information" },
+    { q: "What does PII stand for?", a: "Personally Identifiable Information" },
+    { q: "What does RAID stand for?", a: "Redundant Array of Independent Disks" },
+    { q: "What does SED stand for?", a: "Self-Encrypting Drive" },
+    { q: "What does SSD stand for?", a: "Solid State Drive" },
+  ]},
+  { id: 'acr-email', station: 1, name: "Email & Messaging", reg: "EMAIL", cards: [
+    { q: "What does DKIM stand for?", a: "DomainKeys Identified Mail" },
+    { q: "What does DMARC stand for?", a: "Domain-based Message Authentication, Reporting, and Conformance" },
+    { q: "What does IM stand for?", a: "Instant Messaging" },
+    { q: "What does IMAP stand for?", a: "Internet Message Access Protocol" },
+    { q: "What does PGP stand for?", a: "Pretty Good Privacy" },
+    { q: "What does POP stand for?", a: "Post Office Protocol" },
+    { q: "What does S/MIME stand for?", a: "Secure/Multipurpose Internet Mail Extensions" },
+    { q: "What does SMTP stand for?", a: "Simple Mail Transfer Protocol" },
+    { q: "What does SMTPS stand for?", a: "Simple Mail Transfer Protocol Secure" },
+    { q: "What does SPF stand for?", a: "Sender Policy Framework" },
+    { q: "What does SPIM stand for?", a: "Spam over Instant Messaging" },
+  ]},
+  { id: 'acr-endpoint', station: 1, name: "Endpoint, Host & Application", reg: "ENDPOINT", cards: [
+    { q: "What does API stand for?", a: "Application Programming Interface" },
+    { q: "What does ASLR stand for?", a: "Address Space Layout Randomization" },
+    { q: "What does AV stand for?", a: "Antivirus" },
+    { q: "What does BASH stand for?", a: "Bourne Again Shell" },
+    { q: "What does BIOS stand for?", a: "Basic Input/Output System" },
+    { q: "What does CMS stand for?", a: "Content Management System" },
+    { q: "What does DEP stand for?", a: "Data Execution Prevention" },
+    { q: "What does DLL stand for?", a: "Dynamic Link Library" },
+    { q: "What does EDR stand for?", a: "Endpoint Detection and Response" },
+    { q: "What does FACL stand for?", a: "File System Access Control List" },
+    { q: "What does FPGA stand for?", a: "Field Programmable Gate Array" },
+    { q: "What does GPO stand for?", a: "Group Policy Object" },
+    { q: "What does HIDS stand for?", a: "Host-based Intrusion Detection System" },
+    { q: "What does HIPS stand for?", a: "Host-based Intrusion Prevention System" },
+    { q: "What does HTML stand for?", a: "Hypertext Markup Language" },
+    { q: "What does IoT stand for?", a: "Internet of Things" },
+    { q: "What does MFD stand for?", a: "Multifunction Device" },
+    { q: "What does MFP stand for?", a: "Multifunction Printer" },
+    { q: "What does NTFS stand for?", a: "New Technology File System" },
+    { q: "What does OS stand for?", a: "Operating System" },
+    { q: "What does PED stand for?", a: "Personal Electronic Device" },
+    { q: "What does RTOS stand for?", a: "Real-Time Operating System" },
+    { q: "What does SDK stand for?", a: "Software Development Kit" },
+    { q: "What does SDLC stand for?", a: "Software Development Lifecycle" },
+    { q: "What does SOAP stand for?", a: "Simple Object Access Protocol" },
+    { q: "What does SoC stand for?", a: "System on Chip" },
+    { q: "What does SQL stand for?", a: "Structured Query Language" },
+    { q: "What does TPM stand for?", a: "Trusted Platform Module" },
+    { q: "What does UEFI stand for?", a: "Unified Extensible Firmware Interface" },
+    { q: "What does UEM stand for?", a: "Unified Endpoint Management" },
+    { q: "What does USB stand for?", a: "Universal Serial Bus" },
+    { q: "What does USB OTG stand for?", a: "USB On-the-Go" },
+    { q: "What does WAF stand for?", a: "Web Application Firewall" },
+    { q: "What does XML stand for?", a: "Extensible Markup Language" },
+  ]},
+  { id: 'acr-grc', station: 1, name: "Governance, Risk & Compliance", reg: "GRC", cards: [
+    { q: "What does ALE stand for?", a: "Annualized Loss Expectancy" },
+    { q: "What does ARO stand for?", a: "Annualized Rate of Occurrence" },
+    { q: "What does AUP stand for?", a: "Acceptable Use Policy" },
+    { q: "What does BCP stand for?", a: "Business Continuity Plan" },
+    { q: "What does BIA stand for?", a: "Business Impact Analysis" },
+    { q: "What does BPA stand for?", a: "Business Partners Agreement" },
+    { q: "What does CAR stand for?", a: "Corrective Action Report" },
+    { q: "What does CIA stand for?", a: "Confidentiality, Integrity, and Availability" },
+    { q: "What does CIO stand for?", a: "Chief Information Officer" },
+    { q: "What does COOP stand for?", a: "Continuity of Operations Plan" },
+    { q: "What does CP stand for?", a: "Contingency Planning" },
+    { q: "What does CSO stand for?", a: "Chief Security Officer" },
+    { q: "What does CTO stand for?", a: "Chief Technology Officer" },
+    { q: "What does DPO stand for?", a: "Data Protection Officer" },
+    { q: "What does DRP stand for?", a: "Disaster Recovery Plan" },
+    { q: "What does ERP stand for?", a: "Enterprise Resource Planning" },
+    { q: "What does GDPR stand for?", a: "General Data Protection Regulation" },
+    { q: "What does ISO stand for?", a: "International Organization for Standardization" },
+    { q: "What does ISSO stand for?", a: "Information Systems Security Officer" },
+    { q: "What does MOA stand for?", a: "Memorandum of Agreement" },
+    { q: "What does MOU stand for?", a: "Memorandum of Understanding" },
+    { q: "What does MSA stand for?", a: "Master Service Agreement" },
+    { q: "What does MSP stand for?", a: "Managed Service Provider" },
+    { q: "What does MTBF stand for?", a: "Mean Time Between Failures" },
+    { q: "What does MTTF stand for?", a: "Mean Time to Failure" },
+    { q: "What does NDA stand for?", a: "Non-Disclosure Agreement" },
+    { q: "What does NIST stand for?", a: "National Institute of Standards and Technology" },
+    { q: "What does PCI DSS stand for?", a: "Payment Card Industry Data Security Standard" },
+    { q: "What does ROI stand for?", a: "Return on Investment" },
+    { q: "What does RTO stand for?", a: "Recovery Time Objective" },
+    { q: "What does SLA stand for?", a: "Service Level Agreement" },
+    { q: "What does SLE stand for?", a: "Single Loss Expectancy" },
+    { q: "What does SOW stand for?", a: "Statement of Work" },
+    { q: "What does UAT stand for?", a: "User Acceptance Testing" },
+  ]},
+  { id: 'acr-iam', station: 1, name: "Identity & Access Management", reg: "IAM", cards: [
+    { q: "What does AAA stand for?", a: "Authentication, Authorization, and Accounting" },
+    { q: "What does CAPTCHA stand for?", a: "Completely Automated Public Turing Test to Tell Computers and Humans Apart" },
+    { q: "What does CHAP stand for?", a: "Challenge Handshake Authentication Protocol" },
+    { q: "What does DAC stand for?", a: "Discretionary Access Control" },
+    { q: "What does EAP stand for?", a: "Extensible Authentication Protocol" },
+    { q: "What does FAR stand for?", a: "False Acceptance Rate" },
+    { q: "What does FRR stand for?", a: "False Rejection Rate" },
+    { q: "What does HOTP stand for?", a: "HMAC-based One-Time Password" },
+    { q: "What does IAM stand for?", a: "Identity and Access Management" },
+    { q: "What does IdP stand for?", a: "Identity Provider" },
+    { q: "What does KDC stand for?", a: "Key Distribution Center" },
+    { q: "What does LDAP stand for?", a: "Lightweight Directory Access Protocol" },
+    { q: "What does MAC stand for (access control model context)?", a: "Mandatory Access Control" },
+    { q: "What does MFA stand for?", a: "Multifactor Authentication" },
+    { q: "What does NTLM stand for?", a: "New Technology LAN Manager" },
+    { q: "What does OAuth stand for?", a: "Open Authorization" },
+    { q: "What does PAM stand for (security discipline context)?", a: "Privileged Access Management" },
+    { q: "What does PAM stand for (Linux/Unix authentication context)?", a: "Pluggable Authentication Modules" },
+    { q: "What does PAP stand for?", a: "Password Authentication Protocol" },
+    { q: "What does PIV stand for?", a: "Personal Identity Verification" },
+    { q: "What does RBAC stand for (the common model)?", a: "Role-Based Access Control" },
+    { q: "What does RBAC stand for (the rule-based variant)?", a: "Rule-Based Access Control" },
+    { q: "What does SAML stand for?", a: "Security Assertion Markup Language" },
+    { q: "What does SSO stand for?", a: "Single Sign-On" },
+    { q: "What does TACACS+ stand for?", a: "Terminal Access Controller Access Control System Plus" },
+    { q: "What does TGT stand for?", a: "Ticket Granting Ticket" },
+    { q: "What does TOTP stand for?", a: "Time-based One-Time Password" },
+    { q: "What does ZTNA stand for?", a: "Zero Trust Network Access" },
+  ]},
+  { id: 'acr-network', station: 1, name: "Network & Infrastructure", reg: "NETWORK", cards: [
+    { q: "What does ACL stand for?", a: "Access Control List" },
+    { q: "What does AH stand for?", a: "Authentication Header" },
+    { q: "What does ARP stand for?", a: "Address Resolution Protocol" },
+    { q: "What does BGP stand for?", a: "Border Gateway Protocol" },
+    { q: "What does BPDU stand for?", a: "Bridge Protocol Data Unit" },
+    { q: "What does CRC stand for?", a: "Cyclic Redundancy Check" },
+    { q: "What does CSU stand for?", a: "Channel Service Unit" },
+    { q: "What does DHCP stand for?", a: "Dynamic Host Configuration Protocol" },
+    { q: "What does DNAT stand for?", a: "Destination Network Address Translation" },
+    { q: "What does DNS stand for?", a: "Domain Name System" },
+    { q: "What does DNSSEC stand for?", a: "Domain Name System Security Extensions" },
+    { q: "What does ESP stand for?", a: "Encapsulating Security Payload" },
+    { q: "What does FTP stand for?", a: "File Transfer Protocol" },
+    { q: "What does FTPS stand for?", a: "File Transfer Protocol Secure" },
+    { q: "What does GRE stand for?", a: "Generic Routing Encapsulation" },
+    { q: "What does HTTP stand for?", a: "Hypertext Transfer Protocol" },
+    { q: "What does HTTPS stand for?", a: "Hypertext Transfer Protocol Secure" },
+    { q: "What does ICMP stand for?", a: "Internet Control Message Protocol" },
+    { q: "What does ICS stand for?", a: "Industrial Control System" },
+    { q: "What does IEEE stand for?", a: "Institute of Electrical and Electronics Engineers" },
+    { q: "What does IP stand for?", a: "Internet Protocol" },
+    { q: "What does ISP stand for?", a: "Internet Service Provider" },
+    { q: "What does L2TP stand for?", a: "Layer 2 Tunneling Protocol" },
+    { q: "What does LAN stand for?", a: "Local Area Network" },
+    { q: "What does MAC stand for (hardware address context)?", a: "Media Access Control Address" },
+    { q: "What does MAN stand for?", a: "Metropolitan Area Network" },
+    { q: "What does MPLS stand for?", a: "Multiprotocol Label Switching" },
+    { q: "What does MTU stand for?", a: "Maximum Transmission Unit" },
+    { q: "What does NAC stand for?", a: "Network Access Control" },
+    { q: "What does NAT stand for?", a: "Network Address Translation" },
+    { q: "What does NGFW stand for?", a: "Next-Generation Firewall" },
+    { q: "What does NTP stand for?", a: "Network Time Protocol" },
+    { q: "What does OSPF stand for?", a: "Open Shortest Path First" },
+    { q: "What does OT stand for?", a: "Operational Technology" },
+    { q: "What does P2P stand for?", a: "Peer-to-Peer" },
+    { q: "What does PAC stand for?", a: "Proxy Auto Configuration" },
+    { q: "What does PAT stand for?", a: "Port Address Translation" },
+    { q: "What does PBX stand for?", a: "Private Branch Exchange" },
+    { q: "What does POTS stand for?", a: "Plain Old Telephone Service" },
+    { q: "What does PPP stand for?", a: "Point-to-Point Protocol" },
+    { q: "What does PPTP stand for?", a: "Point-to-Point Tunneling Protocol" },
+    { q: "What does RADIUS stand for?", a: "Remote Authentication Dial-In User Service" },
+    { q: "What does RAS stand for?", a: "Remote Access Server" },
+    { q: "What does RDP stand for?", a: "Remote Desktop Protocol" },
+    { q: "What does SASE stand for?", a: "Secure Access Service Edge" },
+    { q: "What does SCADA stand for?", a: "Supervisory Control and Data Acquisition" },
+    { q: "What does SD-WAN stand for?", a: "Software-Defined Wide Area Network" },
+    { q: "What does SDN stand for?", a: "Software-Defined Networking" },
+    { q: "What does SFTP stand for?", a: "Secure File Transfer Protocol" },
+    { q: "What does SNMP stand for?", a: "Simple Network Management Protocol" },
+    { q: "What does SRTP stand for?", a: "Secure Real-Time Transport Protocol" },
+    { q: "What does SSH stand for?", a: "Secure Shell" },
+    { q: "What does STP stand for?", a: "Shielded Twisted Pair" },
+    { q: "What does SWG stand for?", a: "Secure Web Gateway" },
+    { q: "What does TCP stand for?", a: "Transmission Control Protocol" },
+    { q: "What does UDP stand for?", a: "User Datagram Protocol" },
+    { q: "What does URI stand for?", a: "Uniform Resource Identifier" },
+    { q: "What does UTM stand for?", a: "Unified Threat Management" },
+    { q: "What does UTP stand for?", a: "Unshielded Twisted Pair" },
+    { q: "What does VLAN stand for?", a: "Virtual Local Area Network" },
+    { q: "What does VLSM stand for?", a: "Variable Length Subnet Masking" },
+    { q: "What does VoIP stand for?", a: "Voice over Internet Protocol" },
+    { q: "What does VPN stand for?", a: "Virtual Private Network" },
+  ]},
+  { id: 'acr-physical', station: 1, name: "Physical & Environmental", reg: "PHYSICAL", cards: [
+    { q: "What does CCTV stand for?", a: "Closed-Circuit Television" },
+    { q: "What does HVAC stand for?", a: "Heating, Ventilation, and Air Conditioning" },
+    { q: "What does IDF stand for?", a: "Intermediate Distribution Frame" },
+    { q: "What does MDF stand for?", a: "Main Distribution Frame" },
+    { q: "What does PDU stand for?", a: "Power Distribution Unit" },
+    { q: "What does RFID stand for?", a: "Radio Frequency Identification" },
+    { q: "What does UAV stand for?", a: "Unmanned Aerial Vehicle" },
+    { q: "What does UPS stand for?", a: "Uninterruptible Power Supply" },
+  ]},
+  { id: 'acr-secops', station: 1, name: "Security Operations & Monitoring", reg: "SECOPS", cards: [
+    { q: "What does AI stand for?", a: "Artificial Intelligence" },
+    { q: "What does AIS stand for?", a: "Automated Indicator Sharing" },
+    { q: "What does ATT&CK stand for?", a: "Adversarial Tactics, Techniques, and Common Knowledge" },
+    { q: "What does CERT stand for?", a: "Computer Emergency Response Team" },
+    { q: "What does CIRT stand for?", a: "Computer Incident Response Team" },
+    { q: "What does CVE stand for?", a: "Common Vulnerabilities and Exposures" },
+    { q: "What does CVSS stand for?", a: "Common Vulnerability Scoring System" },
+    { q: "What does FIM stand for?", a: "File Integrity Monitoring" },
+    { q: "What does HA stand for?", a: "High Availability" },
+    { q: "What does IDS stand for?", a: "Intrusion Detection System" },
+    { q: "What does IoC stand for?", a: "Indicators of Compromise" },
+    { q: "What does IPS stand for?", a: "Intrusion Prevention System" },
+    { q: "What does IR stand for?", a: "Incident Response" },
+    { q: "What does IRP stand for?", a: "Incident Response Plan" },
+    { q: "What does ML stand for?", a: "Machine Learning" },
+    { q: "What does MSSP stand for?", a: "Managed Security Service Provider" },
+    { q: "What does MTTR stand for?", a: "Mean Time to Repair" },
+    { q: "What does NIDS stand for?", a: "Network-based Intrusion Detection System" },
+    { q: "What does NIPS stand for?", a: "Network-based Intrusion Prevention System" },
+    { q: "What does PCAP stand for?", a: "Packet Capture" },
+    { q: "What does RPO stand for?", a: "Recovery Point Objective" },
+    { q: "What does SCAP stand for?", a: "Security Content Automation Protocol" },
+    { q: "What does SIEM stand for?", a: "Security Information and Event Management" },
+    { q: "What does SOAR stand for?", a: "Security Orchestration, Automation, and Response" },
+    { q: "What does SOC stand for?", a: "Security Operations Center" },
+    { q: "What does STIX stand for?", a: "Structured Threat Information eXpression" },
+    { q: "What does TAXII stand for?", a: "Trusted Automated eXchange of Indicator Information" },
+    { q: "What does UEBA stand for?", a: "User and Entity Behavior Analytics" },
+    { q: "What does XDR stand for?", a: "Extended Detection and Response" },
+  ]},
+  { id: 'acr-threats', station: 1, name: "Threats, Attacks & Malware", reg: "THREATS", cards: [
+    { q: "What does APT stand for?", a: "Advanced Persistent Threat" },
+    { q: "What does CSRF stand for?", a: "Cross-Site Request Forgery" },
+    { q: "What does DDoS stand for?", a: "Distributed Denial-of-Service" },
+    { q: "What does DoS stand for?", a: "Denial-of-Service" },
+    { q: "What does GPU stand for?", a: "Graphics Processing Unit" },
+    { q: "What does IRC stand for?", a: "Internet Relay Chat" },
+    { q: "What does OSINT stand for?", a: "Open-Source Intelligence" },
+    { q: "What does RAT stand for?", a: "Remote Access Trojan" },
+    { q: "What does SEH stand for?", a: "Structured Exception Handler" },
+    { q: "What does SQLi stand for?", a: "SQL Injection" },
+    { q: "What does TTP stand for?", a: "Tactics, Techniques, and Procedures" },
+    { q: "What does URL stand for?", a: "Uniform Resource Locator" },
+    { q: "What does VBA stand for?", a: "Visual Basic for Applications" },
+    { q: "What does XSRF stand for?", a: "Cross-Site Request Forgery" },
+    { q: "What does XSS stand for?", a: "Cross-Site Scripting" },
+  ]},
+  { id: 'acr-wireless', station: 1, name: "Wireless & Mobile", reg: "WIRELESS", cards: [
+    { q: "What does AP stand for?", a: "Access Point" },
+    { q: "What does BYOD stand for?", a: "Bring Your Own Device" },
+    { q: "What does CCMP stand for?", a: "Counter Mode/CBC-MAC Protocol" },
+    { q: "What does COPE stand for?", a: "Corporate-Owned, Personally Enabled" },
+    { q: "What does CYOD stand for?", a: "Choose Your Own Device" },
+    { q: "What does ESN stand for?", a: "Electronic Serial Number" },
+    { q: "What does GPS stand for?", a: "Global Positioning System" },
+    { q: "What does LEAP stand for?", a: "Lightweight Extensible Authentication Protocol" },
+    { q: "What does MDM stand for?", a: "Mobile Device Management" },
+    { q: "What does MMS stand for?", a: "Multimedia Messaging Service" },
+    { q: "What does NFC stand for?", a: "Near Field Communication" },
+    { q: "What does OTA stand for?", a: "Over-the-Air" },
+    { q: "What does PEAP stand for?", a: "Protected Extensible Authentication Protocol" },
+    { q: "What does PSK stand for?", a: "Pre-Shared Key" },
+    { q: "What does SAE stand for?", a: "Simultaneous Authentication of Equals" },
+    { q: "What does SIM stand for?", a: "Subscriber Identity Module" },
+    { q: "What does SMS stand for?", a: "Short Message Service" },
+    { q: "What does TKIP stand for?", a: "Temporal Key Integrity Protocol" },
+    { q: "What does WAP stand for?", a: "Wireless Access Point" },
+    { q: "What does WEP stand for?", a: "Wired Equivalent Privacy" },
+    { q: "What does WIDS stand for?", a: "Wireless Intrusion Detection System" },
+    { q: "What does WIPS stand for?", a: "Wireless Intrusion Prevention System" },
+    { q: "What does WPA stand for?", a: "Wi-Fi Protected Access" },
+    { q: "What does WPS stand for?", a: "Wi-Fi Protected Setup" },
+  ]},
+];
+
+/* ============================================================
+   STATE + FLASHCARD ENGINE
+   ============================================================ */
+let currentTopic = null, currentCards = [], currentIndex = 0, revealed = false;
+let scores = { correct: 0, wrong: 0, skip: 0 };
+let topicScores = {};
+
+const STATION_NAMES = {
+  1: "Category 1",
+};
+
+function buildTopicGrid() {
+  const grid = document.getElementById('topic-grid');
+  let lastStation = null;
+  TOPICS.slice().sort((a, b) => a.station - b.station).forEach(t => {
+    if (t.station !== lastStation) {
+      const lbl = document.createElement('div');
+      lbl.className = 'station-group-label';
+      lbl.style.gridColumn = '1 / -1';
+      lbl.textContent = STATION_NAMES[t.station];
+      grid.appendChild(lbl);
+      lastStation = t.station;
+    }
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn'; btn.id = 'topic-' + t.id;
+    btn.innerHTML = '<span class="reg-tag">' + t.reg + '</span>' + t.name + '<span class="count-tag">' + t.cards.length + '</span>';
+    btn.onclick = () => selectTopic(t.id);
+    grid.appendChild(btn);
+  });
+}
+function selectTopic(id) {
+  currentTopic = TOPICS.find(t => t.id === id);
+  currentCards = shuffle(currentTopic.cards.slice());
+  currentIndex = 0; revealed = false;
+  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('topic-' + id).classList.add('active');
+  document.getElementById('current-topic-tag').textContent = currentTopic.reg + ' — ' + currentTopic.name.toUpperCase();
+  if (!topicScores[id]) topicScores[id] = { correct: 0, wrong: 0 };
+  loadCard();
+  scrollToCard();
+}
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+  return arr;
+}
+function loadCard() {
+  if (!currentTopic || currentCards.length === 0) return;
+  const card = currentCards[currentIndex % currentCards.length];
+  revealed = false;
+  document.getElementById('main-card').className = 'card';
+  document.getElementById('card-topic').textContent = currentTopic.reg + ' — ' + currentTopic.name;
+  document.getElementById('card-q').textContent = card.q;
+  document.getElementById('card-a').innerHTML = card.a;
+  document.getElementById('card-a').classList.remove('show');
+  document.getElementById('reveal-btn').disabled = false;
+  document.getElementById('skip-btn').disabled = false;
+  document.getElementById('reveal-row').style.display = 'flex';
+  document.getElementById('judge-row').style.display = 'none';
+  document.getElementById('next-row').style.display = 'none';
+  document.getElementById('deck-label').textContent = 'Answer out loud, then reveal';
+  const total = currentCards.length;
+  document.getElementById('progress-bar').style.width = ((currentIndex % total) / total) * 100 + '%';
+}
+function revealAnswer() {
+  revealed = true;
+  document.getElementById('card-a').classList.add('show');
+  document.getElementById('main-card').classList.add('revealed');
+  document.getElementById('reveal-row').style.display = 'none';
+  document.getElementById('judge-row').style.display = 'flex';
+  document.getElementById('next-row').style.display = 'flex';
+  document.getElementById('deck-label').textContent = 'Score yourself honestly';
+}
+function markCard(result) {
+  const card = document.getElementById('main-card');
+  if (result === 'correct') { scores.correct++; card.classList.remove('revealed'); card.classList.add('correct-card'); if (currentTopic) topicScores[currentTopic.id].correct++; }
+  else { scores.wrong++; card.classList.remove('revealed'); card.classList.add('wrong-card'); if (currentTopic) topicScores[currentTopic.id].wrong++; }
+  updateScores(); updateWeakTopics();
+  document.getElementById('judge-row').style.display = 'none';
+  document.getElementById('deck-label').textContent = result === 'correct' ? 'Marked correct' : 'Marked missed — this topic goes in weak areas';
+}
+
+/* Scroll the card into view under the sticky topbar */
+function scrollToCard() {
+  const target = document.querySelector('.card-container');
+  const bar = document.querySelector('.topbar');
+  if (!target) return;
+  target.style.scrollMarginTop = ((bar ? bar.offsetHeight : 100) + 14) + 'px';
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function skipCard() { scores.skip++; updateScores(); nextCard(); }
+function nextCard() {
+  currentIndex++;
+  if (currentIndex >= currentCards.length) { currentCards = shuffle(currentTopic.cards.slice()); currentIndex = 0; }
+  loadCard();
+}
+function updateScores() {
+  document.getElementById('score-correct').textContent = scores.correct;
+  document.getElementById('score-wrong').textContent = scores.wrong;
+  document.getElementById('score-skip').textContent = scores.skip;
+}
+function resetScores() {
+  scores = { correct: 0, wrong: 0, skip: 0 }; topicScores = {};
+  updateScores(); updateWeakTopics();
+  if (currentTopic) selectTopic(currentTopic.id);
+}
+function updateWeakTopics() {
+  const weak = [];
+  for (const id in topicScores) {
+    const s = topicScores[id]; const total = s.correct + s.wrong;
+    if (total >= 3 && s.wrong / total > 0.4) {
+      const topic = TOPICS.find(t => t.id === id);
+      weak.push(topic.name + ' (' + s.wrong + 'W / ' + s.correct + 'C)');
+    }
+  }
+  const section = document.getElementById('weak-section');
+  const list = document.getElementById('weak-list');
+  if (weak.length > 0) { section.style.display = 'block'; list.innerHTML = weak.join('<br>'); }
+  else { section.style.display = 'none'; }
+}
+
+/* ---------- Hamburger menu + view switching ---------- */
+const VIEW_LABELS = {
+  flashcards: 'FLASHCARDS',
+  guide: 'STUDY GUIDE'
+};
+const drawer = document.getElementById('nav-drawer');
+const burger = document.getElementById('hamburger');
+
+function setDrawer(open) {
+  drawer.classList.toggle('open', open);
+  burger.classList.toggle('open', open);
+  burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+}
+burger.onclick = () => setDrawer(!drawer.classList.contains('open'));
+
+function switchView(view) {
+  document.querySelectorAll('.nav-item').forEach(t => t.classList.toggle('active', t.dataset.view === view));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.getElementById('score-bar').style.display = (view === 'flashcards') ? 'flex' : 'none';
+  document.getElementById('current-view-tag').textContent = VIEW_LABELS[view] || '';
+  setDrawer(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.querySelectorAll('.nav-item').forEach(t => t.onclick = () => switchView(t.dataset.view));
+
+/* Close the drawer on Escape or on a tap outside it */
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setDrawer(false); });
+document.addEventListener('click', e => {
+  if (drawer.classList.contains('open') && !drawer.contains(e.target) && !burger.contains(e.target)) setDrawer(false);
+});
+
+/* ---------- Date stamp ---------- */
+function setDate() {
+  const d = new Date();
+  const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const stamp = String(d.getDate()).padStart(2, '0') + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  document.getElementById('date-tag').innerHTML = 'LAST UPDATED: ' + stamp + '<br>TARGET DATE: SET YOUR OWN';
+}
+  /* ---------- Init ---------- */
+buildTopicGrid();
+setDate();
+</script>
+</body>
+</html>
